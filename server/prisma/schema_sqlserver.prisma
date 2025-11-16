@@ -1,0 +1,208 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// USERS
+// ============================================
+model User {
+  id            String        @id @default(uuid())
+  email         String        @unique
+  password      String
+  name          String
+  role          String        @default("guest") // guest, operator, admin
+  active        Boolean       @default(true)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  
+  reservations  Reservation[]
+  
+  @@map("users")
+}
+
+// ============================================
+// ROOMS
+// ============================================
+model Room {
+  id                String              @id @default(uuid())
+  name              String
+  roomNumber        String              @unique
+  type              String              @default("estandar") // estandar, lujo, familiar, presidencial, cordillera
+  floor             Int                 @default(1)
+  
+  // Precios y capacidad
+  price             Decimal             @db.Decimal(10, 2)
+  capacity          Int                 @default(2)
+  maxCapacity       Int                 @default(3)
+  
+  // Estado operativo
+  status            String              @default("disponible") // disponible, ocupada, limpieza, mantenimiento, fuera_de_servicio, reservada
+  cleaningStatus    String              @default("limpia") // limpia, sucia, en_proceso, inspeccion
+  lastCleaned       DateTime?
+  cleanedBy         String?
+  
+  // Ocupación actual
+  currentGuest      String?
+  checkInDate       DateTime?
+  checkOutDate      DateTime?
+  
+  // Ubicación
+  building          String              @default("Principal")
+  view              String              @default("jardin") // cordillera, jardin, piscina, lateral
+  locationLat       Decimal?            @db.Decimal(10, 8)
+  locationLng       Decimal?            @db.Decimal(11, 8)
+  
+  // Descripción
+  description       String?             @db.Text
+  image             String?
+  notes             String?             @db.Text
+  
+  // Estadísticas
+  totalReservations Int                 @default(0)
+  averageRating     Decimal?            @db.Decimal(3, 2)
+  lastOccupied      DateTime?
+  
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  // Relaciones
+  amenities         RoomAmenity[]
+  images            RoomImage[]
+  maintenance       MaintenanceRecord[]
+  specialRequests   SpecialRequest[]
+  reservations      Reservation[]
+  
+  @@map("rooms")
+}
+
+// ============================================
+// ROOM AMENITIES
+// ============================================
+model RoomAmenity {
+  id        String   @id @default(uuid())
+  roomId    String
+  amenity   String
+  
+  room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  
+  @@map("room_amenities")
+}
+
+// ============================================
+// ROOM IMAGES
+// ============================================
+model RoomImage {
+  id        String   @id @default(uuid())
+  roomId    String
+  url       String
+  order     Int      @default(0)
+  
+  room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  
+  @@map("room_images")
+}
+
+// ============================================
+// MAINTENANCE RECORDS
+// ============================================
+model MaintenanceRecord {
+  id              String    @id @default(uuid())
+  roomId          String
+  type            String    // preventivo, correctivo, urgente
+  description     String    @db.Text
+  scheduledDate   DateTime
+  completedDate   DateTime?
+  assignedTo      String?
+  status          String    @default("pendiente") // pendiente, en_proceso, completado, cancelado
+  priority        String    @default("media") // normal, baja, media, alta, urgente
+  notes           String?   @db.Text
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  room            Room      @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  
+  @@map("maintenance_records")
+}
+
+// ============================================
+// SPECIAL REQUESTS
+// ============================================
+model SpecialRequest {
+  id        String   @id @default(uuid())
+  roomId    String
+  request   String   @db.Text
+  createdAt DateTime @default(now())
+  
+  room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  
+  @@map("special_requests")
+}
+
+// ============================================
+// RESERVATIONS
+// ============================================
+model Reservation {
+  id              String    @id @default(uuid())
+  roomId          String?   // Opcional - asignado por operador
+  userId          String?
+  
+  // Información del cliente
+  name            String
+  email           String
+  phone           String?
+  
+  // Tipo de habitación solicitada (NO habitación específica)
+  roomType        String    // estandar, lujo, familiar, presidencial, cordillera
+  
+  // Fechas
+  checkIn         DateTime
+  checkOut        DateTime
+  
+  // Detalles
+  people          Int       @default(1)
+  specialRequests String?   @db.Text
+  
+  // Estados
+  status          String    @default("pending") // pending, confirmed, cancelled, completed
+  paymentStatus   String    @default("pending") // pending, paid, refunded, cancelled
+  
+  // Precios
+  totalPrice      Decimal?  @db.Decimal(10, 2)
+  
+  // Timestamps
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  // Relaciones
+  room            Room?     @relation(fields: [roomId], references: [id])
+  user            User?     @relation(fields: [userId], references: [id])
+  
+  @@map("reservations")
+}
+
+// ============================================
+// INQUIRIES
+// ============================================
+model Inquiry {
+  id          String    @id @default(uuid())
+  name        String
+  email       String
+  phone       String?
+  message     String    @db.Text
+  type        String    @default("consulta") // consulta, experiencia_vip
+  service     String?
+  guests      Int?
+  budget      String?
+  eventDate   DateTime?
+  repliedAt   DateTime?
+  priority    String    @default("normal") // normal, baja, media, alta, urgente
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@map("inquiries")
+}

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Hoja">
+  <g fill="none" stroke="#3A4A3D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M54 14c-18 0-32 12-32 30 0 6 5 10 10 10 18 0 26-26 26-40z"/>
+    <path d="M26 36 L48 14" stroke-width="2.6"/>
+  </g>
+</svg>

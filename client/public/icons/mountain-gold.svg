@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Montaña">
+  <g fill="none" stroke="#B8985A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 46 L18 24 L26 33 L32 22 L40 34 L48 28 L60 44"/>
+    <path d="M2 46 H62"/>
+  </g>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Cubiertos">
+  <g fill="none" stroke="#A0553C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Fork -->
+    <path d="M16 6v20M22 6v20M16 14h6"/>
+    <path d="M19 58V26"/>
+    <!-- Knife -->
+    <path d="M44 6c5 0 8 4 8 8v14"/>
+    <path d="M52 58V28"/>
+    <!-- Crossed angle for elegance -->
+    <path d="M12 40 L52 12" stroke-width="2" opacity="0.25"/>
+  </g>
+</svg>
